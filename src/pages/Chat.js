@@ -8,8 +8,9 @@ import encrypted from "../assets/encrypted.svg";
 import url from "../constants/Url";
 import { Fragment } from "react";
 import { logout } from "../actions/auth";
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import TripleDESdecrypt from "../utils/TrripleDES";
 
 // Notice for JAVA KING !
 // contact={
@@ -27,6 +28,7 @@ const Chat = ({ logout, curruser, loading }) => {
   const [activeContact, setActiveContact] = useState(null);
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
+  const [quantumKey, setQuantumKey] = useState("");
   const [conn, setConn] = useState(false);
   const toastId = "toastifyId";
 
@@ -50,7 +52,6 @@ const Chat = ({ logout, curruser, loading }) => {
   }, [curruser]);
 
   const fetchMessages = (userId) => {
-
     axios
       .get(`${url}/messages/${userId}`)
       .then((res) => {
@@ -95,10 +96,9 @@ const Chat = ({ logout, curruser, loading }) => {
         pauseOnHover: true,
         draggable: true,
         progress: undefined,
-        toastId
+        toastId,
       });
     }
-
   };
 
   const sendMessage = (e) => {
@@ -149,11 +149,29 @@ const Chat = ({ logout, curruser, loading }) => {
     return date + " " + time;
   };
 
+  useEffect(() => {
+    if (activeContact !== null && curruser !== null) {
+      axios
+        .get(url + "/keys/", {
+          params: {
+            user_1: curruser.userId,
+            user_2: activeContact,
+          },
+        })
+        .then((res) => {
+          console.log(res.data);
+          console.log(TripleDESdecrypt(res.data.toString(), curruser.pin));
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }
+  }, [activeContact, curruser]);
+
   return loading || curruser == null || !conn ? (
     <Spinner />
   ) : (
     <>
-
       <div className="container">
         <div className="content">
           <div className="left">
@@ -266,8 +284,7 @@ const Chat = ({ logout, curruser, loading }) => {
                     />
                     <button className="send" onClick={sendMessage}>
                       Send
-                  </button>
-
+                    </button>
                   </div>
                 </Fragment>
               )}
