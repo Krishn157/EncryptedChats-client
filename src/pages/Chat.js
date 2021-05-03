@@ -139,28 +139,24 @@ const Chat = ({ logout, curruser, loading }) => {
     }
   }, [curruser]);
 
+  //Decrypting messages
   useEffect(() => {
     if (quantumKey.length > 0) {
-      // console.log(messages);
-      // console.log(messages[0].message);
-      // console.log(aes256.decrypt(quantumKey, messages[1].message));
-      // messages.map((msg) => {
-      //   if (
-      //     msg.sender.userId === curruser.userId ||
-      //     msg.recipient.userId === activeContact
-      //   ) {
-      //     console.log(msg.message);
-      //     // const decrypted = aes256.decrypt(quantumKey, msg.messgae);
-      //     msg.message = "hi";
-      //   }
-      //   return msg;
-      // });
-      setMessages((msg) => {
-        console.log(msg);
-        return {
-          ...msg,
-        };
-      });
+      setMessages(
+        messages.map((msg) => {
+          if (
+            (msg.sender.userId === curruser.userId &&
+              msg.recipient.userId === activeContact) ||
+            (msg.sender.userId === activeContact &&
+              msg.recipient.userId === curruser.userId)
+          ) {
+            // console.log(msg.message);
+
+            msg.message = aes256.decrypt(quantumKey, msg.message);
+          }
+          return msg;
+        })
+      );
     }
   }, [quantumKey]);
 
