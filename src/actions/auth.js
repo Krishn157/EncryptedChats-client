@@ -40,7 +40,7 @@ export const register = (userId, password, confpassword) => async (
     },
   };
   const body = JSON.stringify({ userId, password, confpassword });
-  console.log(body);
+  console.log("headers", axios.defaults.headers.common);
   try {
     const res = await axios.post(url + "/auth/register", body, config);
     console.log(res.data);
@@ -83,5 +83,6 @@ export const login = (userId, password) => async (dispatch) => {
 //LogOut
 
 export const logout = () => (dispatch) => {
+  delete axios.defaults.headers.common["Authorization"];
   dispatch({ type: LOGOUT });
 };

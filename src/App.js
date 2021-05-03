@@ -14,6 +14,7 @@ import Chat from "./pages/Chat";
 import { ToastContainer } from 'react-toastify';
 
 if (localStorage.token) {
+  console.log("localstorage.token", localStorage.token);
   setAuthToken(localStorage.token);
 }
 

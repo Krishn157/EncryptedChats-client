@@ -24,6 +24,7 @@ import aes256 from "aes256";
 
 let stompClient = null;
 let activeC = null;
+let quantumKeyG = null;
 const Chat = ({ logout, curruser, loading }) => {
   const [contacts, setContacts] = useState([]);
   const [activeContact, setActiveContact] = useState(null);
@@ -31,6 +32,7 @@ const Chat = ({ logout, curruser, loading }) => {
   const [messages, setMessages] = useState([]);
   const [quantumKey, setQuantumKey] = useState("");
   const [conn, setConn] = useState(false);
+  const [msgloading, setLoading] = useState(false);
   const toastId = "toastifyId";
 
   useEffect(() => {
@@ -53,10 +55,13 @@ const Chat = ({ logout, curruser, loading }) => {
   }, [curruser]);
 
   const fetchMessages = (userId) => {
+    console.log("userId", userId);
+    console.log("activeContact", activeC);
     axios
-      .get(`${url}/messages/${userId}`)
+      .get(`${url}/messages/${userId}/${activeC}`)
       .then((res) => {
-        setMessages([...res.data]);
+        console.log("res", res.data);
+        setMessagesDecrypted(res.data);
       })
       .catch((err) => {
         console.error(err);
@@ -88,10 +93,11 @@ const Chat = ({ logout, curruser, loading }) => {
   };
 
   const onMessageReceived = (msg) => {
-    fetchMessages(curruser.userId);
     const notification = JSON.parse(msg.body);
-    console.log("activeC", activeC);
-    if (activeC !== notification.sender) {
+    if (activeC === notification.sender) {
+      fetchMessages(curruser.userId);
+    }
+    if (activeC !== notification.sender || activeC === null) {
       toast(`Received a message from ${notification.sender}`, {
         position: "top-right",
         autoClose: 2500,
@@ -105,6 +111,7 @@ const Chat = ({ logout, curruser, loading }) => {
     }
   };
 
+
   const sendMessage = (e) => {
     e.preventDefault();
     if (message.trim() !== "") {
@@ -117,7 +124,6 @@ const Chat = ({ logout, curruser, loading }) => {
       msgIm["recipient"] = { id: 0, userId: activeContact };
       setMessages([...messages, msgIm]);
       const encryptedmsg = aes256.encrypt(quantumKey, message);
-      console.log(encryptedmsg);
 
       const messageReq = {
         senderId: curruser.userId,
@@ -134,31 +140,32 @@ const Chat = ({ logout, curruser, loading }) => {
   };
 
   useEffect(() => {
-    if (curruser != null) {
+    console.log("inside use effect");
+    if (activeContact !== null && quantumKey.length > 0) {
+      console.log("fetch messages called");
       fetchMessages(curruser.userId);
     }
-  }, [curruser]);
+  }, [activeContact, quantumKey]);
 
-  //Decrypting messages
-  useEffect(() => {
-    if (quantumKey.length > 0) {
-      setMessages(
-        messages.map((msg) => {
-          if (
-            (msg.sender.userId === curruser.userId &&
-              msg.recipient.userId === activeContact) ||
-            (msg.sender.userId === activeContact &&
-              msg.recipient.userId === curruser.userId)
-          ) {
-            // console.log(msg.message);
+  const setMessagesDecrypted = (messagesData) => {
+    setLoading(true);
+    setMessages(
+      messagesData.map((msg) => {
+        if (
+          (msg.sender.userId === curruser.userId &&
+            msg.recipient.userId === activeC) ||
+          (msg.sender.userId === activeC &&
+            msg.recipient.userId === curruser.userId)
+        ) {
+          // console.log(msg.message);
 
-            msg.message = aes256.decrypt(quantumKey, msg.message);
-          }
-          return msg;
-        })
-      );
-    }
-  }, [quantumKey]);
+          msg.message = aes256.decrypt(quantumKeyG, msg.message);
+        }
+        return msg;
+      })
+    );
+    setLoading(false);
+  }
 
   const getDateFormat = (timestamp) => {
     let date = new Date(timestamp);
@@ -188,6 +195,7 @@ const Chat = ({ logout, curruser, loading }) => {
         .then((res) => {
           console.log(res.data);
           setQuantumKey(res.data);
+          quantumKeyG = res.data;
         })
         .catch((err) => {
           console.log(err);
@@ -255,7 +263,7 @@ const Chat = ({ logout, curruser, loading }) => {
                 <Fragment>
                   {messages.length > 0 ? (
                     <ScrollToBottom className="messages">
-                      {messages.map((msg, index) => {
+                      {msgloading ? <Spinner /> : messages.map((msg, index) => {
                         if (
                           msg.recipient.userId === activeContact ||
                           msg.sender.userId === activeContact
