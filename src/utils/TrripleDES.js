@@ -1,32 +1,15 @@
-import CryptoJS from "crypto-js";
+import cryptojs from "crypto-js";
 
-/**
- * Encrypt 3DES using Node.js's crypto module *
- * @param data A utf8 string
- * @param key Key would be hashed by md5 and shorten to maximum of 192 bits,
- * @returns {*} A base64 string
- */
 const TripleDESdecrypt = (data, key) => {
-  console.log("key", key);
-  console.log("data", data);
-  const info2 = CryptoJS.TripleDES.decrypt(data, key).toString();
+  const keyhex = cryptojs.enc.Utf8.parse(key)
+  //direct decrypt ciphertext
+  const decrypted = cryptojs.TripleDES.decrypt({
+    ciphertext: cryptojs.enc.Base64.parse(data)
+  }, keyhex, {
+    mode: cryptojs.mode.ECB, padding: cryptojs.pad.Pkcs7
+  });
+  return decrypted.toString(cryptojs.enc.Utf8);
 
-  console.log("info2", { info2 });
-
-  const info3 = JSON.parse(info2);
-
-  console.log("info3", { str: info3.str });
-
-  // var keyHex = CryptoJS.enc.Utf8.parse(key);
-  // let decrypted = CryptoJS.TripleDES.decrypt(data, keyHex, {
-  //   iv: CryptoJS.enc.Utf8.parse("01234567"),
-  //   mode: CryptoJS.mode.CBC,
-  //   padding: CryptoJS.pad.Pkcs7,
-  // });
-
-  // decrypted = decrypted.toString(CryptoJS.enc.Base64);
-  // decrypted = decrypted.toString(CryptoJS.enc.Hex);
-  return "11";
 };
 
 export default TripleDESdecrypt;

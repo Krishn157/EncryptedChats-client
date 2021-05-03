@@ -71,12 +71,17 @@ const Chat = ({ logout, curruser, loading }) => {
   };
 
   const onConnected = () => {
-    console.log(curruser);
-    stompClient.subscribe(
-      "/user/" + curruser.userId + "/queue/messages",
-      onMessageReceived
-    );
-    setConn(true);
+    try {
+      stompClient.subscribe(
+        "/user/" + curruser.userId + "/queue/messages",
+        onMessageReceived
+      );
+      setConn(true);
+
+    } catch (err) {
+      console.log(err.message);
+    }
+
   };
 
   const onError = (err) => {
@@ -160,7 +165,6 @@ const Chat = ({ logout, curruser, loading }) => {
         })
         .then((res) => {
           console.log(res.data);
-          console.log(TripleDESdecrypt(res.data.toString(), curruser.pin));
         })
         .catch((err) => {
           console.log(err);
