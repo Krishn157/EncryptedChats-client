@@ -10,7 +10,8 @@ import { Fragment } from "react";
 import { logout } from "../actions/auth";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import TripleDESdecrypt from "../utils/TrripleDES";
+
+import aes256 from "aes256";
 
 // Notice for JAVA KING !
 // contact={
@@ -77,11 +78,9 @@ const Chat = ({ logout, curruser, loading }) => {
         onMessageReceived
       );
       setConn(true);
-
     } catch (err) {
       console.log(err.message);
     }
-
   };
 
   const onError = (err) => {
@@ -117,11 +116,13 @@ const Chat = ({ logout, curruser, loading }) => {
       msgIm["sender"] = { id: 0, userId: curruser.userId };
       msgIm["recipient"] = { id: 0, userId: activeContact };
       setMessages([...messages, msgIm]);
+      const encryptedmsg = aes256.encrypt(quantumKey, message);
+      console.log(encryptedmsg);
 
       const messageReq = {
         senderId: curruser.userId,
         recipientId: activeContact,
-        message,
+        encryptedmsg,
         timestamp: ts,
       };
       stompClient.send("/cryptoaes/chat", {}, JSON.stringify(messageReq));
@@ -137,6 +138,31 @@ const Chat = ({ logout, curruser, loading }) => {
       fetchMessages(curruser.userId);
     }
   }, [curruser]);
+
+  useEffect(() => {
+    if (quantumKey.length > 0) {
+      // console.log(messages);
+      // console.log(messages[0].message);
+      // console.log(aes256.decrypt(quantumKey, messages[1].message));
+      // messages.map((msg) => {
+      //   if (
+      //     msg.sender.userId === curruser.userId ||
+      //     msg.recipient.userId === activeContact
+      //   ) {
+      //     console.log(msg.message);
+      //     // const decrypted = aes256.decrypt(quantumKey, msg.messgae);
+      //     msg.message = "hi";
+      //   }
+      //   return msg;
+      // });
+      setMessages((msg) => {
+        console.log(msg);
+        return {
+          ...msg,
+        };
+      });
+    }
+  }, [quantumKey]);
 
   const getDateFormat = (timestamp) => {
     let date = new Date(timestamp);
@@ -165,6 +191,7 @@ const Chat = ({ logout, curruser, loading }) => {
         })
         .then((res) => {
           console.log(res.data);
+          setQuantumKey(res.data);
         })
         .catch((err) => {
           console.log(err);
