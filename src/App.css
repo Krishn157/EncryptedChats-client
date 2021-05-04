@@ -440,3 +440,30 @@ background: -webkit-linear-gradient(to right, #fdeff9, #ec38bc, #7303c0, #03001e
 background: linear-gradient(to right, #fdeff9, #ec38bc, #7303c0, #03001e) !important; /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
 
 }
+
+.emoji-custom {
+  background-color: #eee;
+  padding: 10.5px 15px;
+  cursor: pointer;
+}
+
+/* .emoji-picker-react ul.skin-tones-list li {
+  display: none !important;
+} */
+
+.emoji-container {
+  position: absolute;
+  left: 34%;
+  bottom: 8.5%;
+  height: 300px;
+  width: 280px;
+  overflow: hidden;
+}
+
+.app-input {
+  background-color: #eee;
+  border: none;
+  padding: 12px 15px;
+  margin: 8px 0;
+  width: 100%;
+}

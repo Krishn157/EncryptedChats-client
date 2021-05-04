@@ -10,6 +10,8 @@ import { Fragment } from "react";
 import { logout } from "../actions/auth";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import Picker, { SKIN_TONE_NEUTRAL } from 'emoji-picker-react';
+
 
 import aes256 from "aes256";
 
@@ -33,6 +35,8 @@ const Chat = ({ logout, curruser, loading }) => {
   const [quantumKey, setQuantumKey] = useState("");
   const [conn, setConn] = useState(false);
   const [msgloading, setLoading] = useState(false);
+  const [showPicker, setShowPicker] = useState(false);
+  const [chosenEmoji, setChosenEmoji] = useState(null);
   const toastId = "toastifyId";
 
   useEffect(() => {
@@ -203,6 +207,11 @@ const Chat = ({ logout, curruser, loading }) => {
     }
   }, [activeContact, curruser]);
 
+  const onEmojiClick = (event, emojiObject) => {
+    setChosenEmoji(emojiObject);
+    setMessage(message + emojiObject.emoji);
+  };
+
   return loading || curruser == null || !conn ? (
     <Spinner />
   ) : (
@@ -236,7 +245,7 @@ const Chat = ({ logout, curruser, loading }) => {
           </div>
           <div className="right">
             <i
-              className="fa fa-sign-out log"
+              className="fas fa-sign-out-alt log"
               aria-hidden="true"
               onClick={() => logout()}
             ></i>
@@ -304,8 +313,24 @@ const Chat = ({ logout, curruser, loading }) => {
                     </div>
                   )}
                   <div className="send-messages">
+                    <div className="emoji-container">
+                      {showPicker && (
+                        <Picker
+                          skinTone={SKIN_TONE_NEUTRAL}
+                          preload={true}
+                          onEmojiClick={onEmojiClick}
+                          native={true}
+                        />
+                      )}
+                    </div>
+
+                    <i
+                      className="far fa-grin-beam emoji-custom"
+                      onClick={(e) => setShowPicker(!showPicker)}
+                    ></i>
                     <input
-                      style={{ width: "87.5%" }}
+                      style={{ width: "78.7%" }}
+                      className="app-input"
                       name="user_input"
                       size="large"
                       value={message}
