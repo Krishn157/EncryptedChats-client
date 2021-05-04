@@ -38,6 +38,7 @@ const SignIn = ({ login, isAuthenticated }) => {
           <h1>Sign in</h1>
 
           <input
+            className="app-input"
             type="text"
             name="userId"
             onChange={handleChange}
@@ -45,6 +46,7 @@ const SignIn = ({ login, isAuthenticated }) => {
             placeholder="User Id"
           />
           <input
+            className="app-input"
             type="password"
             name="password"
             onChange={handleChange}

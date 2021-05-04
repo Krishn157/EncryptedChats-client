@@ -38,6 +38,7 @@ const SignUp = ({ register, isAuthenticated }) => {
           <h1>Create Account</h1>
 
           <input
+            className="app-input"
             type="text"
             name="userId"
             onChange={handleChange}
@@ -45,6 +46,7 @@ const SignUp = ({ register, isAuthenticated }) => {
             placeholder="User Id"
           />
           <input
+            className="app-input"
             type="password"
             name="password"
             onChange={handleChange}
@@ -52,6 +54,7 @@ const SignUp = ({ register, isAuthenticated }) => {
             placeholder="Password"
           />
           <input
+            className="app-input"
             type="password"
             name="confpassword"
             onChange={handleChange}

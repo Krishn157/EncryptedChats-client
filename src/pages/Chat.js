@@ -10,8 +10,7 @@ import { Fragment } from "react";
 import { logout } from "../actions/auth";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import Picker, { SKIN_TONE_NEUTRAL } from 'emoji-picker-react';
-
+import Picker, { SKIN_TONE_NEUTRAL } from "emoji-picker-react";
 
 import aes256 from "aes256";
 
@@ -115,7 +114,6 @@ const Chat = ({ logout, curruser, loading }) => {
     }
   };
 
-
   const sendMessage = (e) => {
     e.preventDefault();
     if (message.trim() !== "") {
@@ -169,7 +167,7 @@ const Chat = ({ logout, curruser, loading }) => {
       })
     );
     setLoading(false);
-  }
+  };
 
   const getDateFormat = (timestamp) => {
     let date = new Date(timestamp);
@@ -272,32 +270,36 @@ const Chat = ({ logout, curruser, loading }) => {
                 <Fragment>
                   {messages.length > 0 ? (
                     <ScrollToBottom className="messages">
-                      {msgloading ? <Spinner /> : messages.map((msg, index) => {
-                        if (
-                          msg.recipient.userId === activeContact ||
-                          msg.sender.userId === activeContact
-                        ) {
-                          return (
-                            <span
-                              key={index}
-                              className={
-                                activeContact === msg.recipient.userId
-                                  ? "sent"
-                                  : "replies"
-                              }
-                            >
-                              {msg.message}
+                      {msgloading ? (
+                        <Spinner />
+                      ) : (
+                        messages.map((msg, index) => {
+                          if (
+                            msg.recipient.userId === activeContact ||
+                            msg.sender.userId === activeContact
+                          ) {
+                            return (
+                              <span
+                                key={index}
+                                className={
+                                  activeContact === msg.recipient.userId
+                                    ? "sent"
+                                    : "replies"
+                                }
+                              >
+                                {msg.message}
 
-                              {/*krishn isko show karna aapka kaam  */}
-                              {/* <br /> */}
-                              {"           "}
-                              <sub class="time">
-                                {getDateFormat(msg.timestamp)}
-                              </sub>
-                            </span>
-                          );
-                        }
-                      })}
+                                {/*krishn isko show karna aapka kaam  */}
+                                {/* <br /> */}
+                                {"           "}
+                                <sub class="time">
+                                  {getDateFormat(msg.timestamp)}
+                                </sub>
+                              </span>
+                            );
+                          }
+                        })
+                      )}
                     </ScrollToBottom>
                   ) : (
                     <div className="messages">
@@ -313,16 +315,16 @@ const Chat = ({ logout, curruser, loading }) => {
                     </div>
                   )}
                   <div className="send-messages">
-                    <div className="emoji-container">
-                      {showPicker && (
+                    {showPicker && (
+                      <div className="emoji-container">
                         <Picker
                           skinTone={SKIN_TONE_NEUTRAL}
                           preload={true}
                           onEmojiClick={onEmojiClick}
                           native={true}
                         />
-                      )}
-                    </div>
+                      </div>
+                    )}
 
                     <i
                       className="far fa-grin-beam emoji-custom"
